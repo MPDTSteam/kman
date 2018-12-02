@@ -1,9 +1,9 @@
-import pygame
+import pygame, random
 from pygame import *
 from settings import Settings
-import wall
+import items
 from hero_enemy import Enemy
-
+boost_dur = 5
 animCount = 0
 walkDown = [pygame.image.load("img/animation_main.png"),pygame.image.load("img/down.png"), pygame.image.load("img/animation_main_2.png")]
 walkUp = [pygame.image.load("img/animation_back.png"),pygame.image.load("img/up.png"), pygame.image.load("img/animation_back_2.png")]
@@ -20,6 +20,8 @@ class Hero(pygame.sprite.Sprite):
         self.yvel = 0
         self.speed = 10
         self.rect = Rect(x,y, 45, 55)
+        self.start_ticks_speed = 0
+        self.random_boost = False
 
 
     def blitme(self):
@@ -62,21 +64,38 @@ class Hero(pygame.sprite.Sprite):
 
         self.rect.x += self.xvel
         self.collide(self.xvel,0,walls)
+        if self.random_boost == True:
+            self.seconds = round((pygame.time.get_ticks() - self.start_ticks_speed) / 1000, 2)
+            #r = random.randint(1, 2)
+            #if r == 1:
+            self.speed = 20
+            #if r == 2:
+            #   self.speed = 5
+            if self.seconds >= boost_dur:
+                self.speed = 10
+                self.random_boost = False
+                self.start_ticks_speed = 0
+
 
     def collide(self,xvel,yvel,walls):
         for w in walls:
             if sprite.collide_rect(self,w):
+                if isinstance(w, items.Teleport):
+                    self.teleporting(w.goX, w.goY)
+                else:
+                    if xvel > 0:
+                        self.rect.right = w.rect.left
 
-                if xvel > 0:
-                    self.rect.right = w.rect.left
+                    if xvel < 0:
+                        self.rect.left = w.rect.right
 
-                if xvel < 0:
-                    self.rect.left = w.rect.right
+                    if yvel > 0:
+                        self.rect.bottom = w.rect.top
+                        self.yvel = 0
 
-                if yvel > 0:
-                    self.rect.bottom = w.rect.top
-                    self.yvel = 0
-
-                if yvel < 0:
-                    self.rect.top = w.rect.bottom
-                    self.yvel = 0
+                    if yvel < 0:
+                        self.rect.top = w.rect.bottom
+                        self.yvel = 0
+    def teleporting(self,goX,goY):
+        self.rect.x = goX
+        self.rect.y = goY

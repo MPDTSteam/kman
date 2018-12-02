@@ -1,7 +1,7 @@
 import pygame
 from pygame import *
 from settings import Settings
-import wall
+from items import *
 
 animCount = 0
 walkDown = [pygame.image.load("img/bot_animation_main.png"),pygame.image.load("img/bot_main.png"), pygame.image.load("img/bot_animation_main_2.png")]
@@ -27,7 +27,7 @@ class Enemy(pygame.sprite.Sprite):
                                        #рух
 
 
-    def update(self,e_left,e_right,e_up,e_down,walls):
+    def update(self,e_left,e_right,e_up,e_down,walls,doors):
         global animCount
 
         if animCount + 1 >= 9:
@@ -57,12 +57,12 @@ class Enemy(pygame.sprite.Sprite):
             self.yvel = 0
             self.image = pygame.image.load("img/bot_main.png")
         self.rect.y += self.yvel
-        self.collide(0,self.yvel,walls)
+        self.collide(0,self.yvel,walls,doors)
 
         self.rect.x += self.xvel
-        self.collide(self.xvel,0,walls)
+        self.collide(self.xvel,0,walls,doors)
 
-    def collide(self,xvel,yvel,walls):
+    def collide(self,xvel,yvel,walls,doors):
         for w in walls:
             if sprite.collide_rect(self,w):
 
@@ -78,4 +78,20 @@ class Enemy(pygame.sprite.Sprite):
 
                 if yvel < 0:
                     self.rect.top = w.rect.bottom
+                    self.yvel = 0
+        for d in doors:
+            if sprite.collide_rect(self,d):
+
+                if xvel > 0:
+                    self.rect.right = d.rect.left
+
+                if xvel < 0:
+                    self.rect.left = d.rect.right
+
+                if yvel > 0:
+                    self.rect.bottom = d.rect.top
+                    self.yvel = 0
+
+                if yvel < 0:
+                    self.rect.top = d.rect.bottom
                     self.yvel = 0
