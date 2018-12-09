@@ -12,3 +12,7 @@ class Settings():
         self.coin_height = 30
         self.door_width = 60
         self.door_height = 60
+        self.tp_width = 45
+        self.tp_height = 60
+        self.h_speed = 10.9
+        self.e_speed = 10.9

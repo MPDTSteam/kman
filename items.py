@@ -4,34 +4,16 @@ from settings import Settings
 
 game_settings = Settings()
 
-class Coin(sprite.Sprite):
-    def __init__(self,x,y):
-        sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("img/coin.png")
-        self.rect = Rect(x,y, game_settings.coin_width, game_settings.coin_height)
-
 class Wall(sprite.Sprite):
     def __init__(self,x,y):
         sprite.Sprite.__init__(self)
         self.image = pygame.image.load("img/l2_walls.jpg")
         self.rect = Rect(x,y, game_settings.wall_width, game_settings.wall_height)
 
-class Side_Wall(sprite.Sprite):
+class GrassWall(sprite.Sprite):
     def __init__(self,x,y):
         sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("img/l2_sidewall.jpg")
-        self.rect = Rect(x,y, game_settings.wall_width, game_settings.wall_height)
-
-class Edge_Wall(sprite.Sprite):
-    def __init__(self,x,y):
-        sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("img/l2_edgewall.jpg")
-        self.rect = Rect(x,y, game_settings.wall_width, game_settings.wall_height)
-
-class Center_Wall(sprite.Sprite):
-    def __init__(self,x,y):
-        sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("img/c_wall.jpg")
+        self.image = pygame.image.load("img/grass.jpg").convert_alpha()
         self.rect = Rect(x,y, game_settings.wall_width, game_settings.wall_height)
 
 
@@ -51,9 +33,9 @@ class Door(sprite.Sprite):
 class Teleport(sprite.Sprite):
     def __init__(self, x, y, goX, goY):
         sprite.Sprite.__init__(self)
-        self.goX = goX  # координаты назначения перемещения
-        self.goY = goY  # координаты назначения перемещения
+        self.goX = goX
+        self.goY = goY
         self.image = pygame.image.load("img/portal.png")
-        self.rect = Rect(x, y, game_settings.wall_width, game_settings.wall_height)
+        self.rect = Rect(x, y, game_settings.tp_width, game_settings.tp_height)
     def update(self):
         self.image.blit(self.image,(0,0))

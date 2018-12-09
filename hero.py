@@ -3,8 +3,10 @@ from pygame import *
 from settings import Settings
 import items
 from hero_enemy import Enemy
-boost_dur = 5
+pygame.init()
+tp_sound = pygame.mixer.Sound("tp.wav")
 animCount = 0
+g_f = Settings()
 walkDown = [pygame.image.load("img/animation_main.png"),pygame.image.load("img/down.png"), pygame.image.load("img/animation_main_2.png")]
 walkUp = [pygame.image.load("img/animation_back.png"),pygame.image.load("img/up.png"), pygame.image.load("img/animation_back_2.png")]
 walkLeft = [pygame.image.load("img/animation_left.png"),pygame.image.load("img/left.png"), pygame.image.load("img/animation_left_2.png")]
@@ -18,7 +20,7 @@ class Hero(pygame.sprite.Sprite):
         self.startX = x
         self.startY = y
         self.yvel = 0
-        self.speed = 10
+        self.speed = g_f.h_speed
         self.rect = Rect(x,y, 45, 55)
         self.start_ticks_speed = 0
         self.random_boost = False
@@ -30,57 +32,47 @@ class Hero(pygame.sprite.Sprite):
                                        #рух
 
 
-    def update(self,left,right,up,down,walls):
+    def update(self,left,right,up,down,walls,grass):
         global animCount
 
-        if animCount + 1 >= 9:
+        if animCount + 1 >= 27:
             animCount = 0
         if up:
             #self.xvel = 0
             self.yvel = -self.speed
-            self.image = walkUp[animCount // 3]
+            self.image = walkUp[animCount // 10]
             animCount += 1
         if down:
             #self.xvel = 0
             self.yvel = self.speed
-            self.image = walkDown[animCount // 3]
+            self.image = walkDown[animCount // 10]
             animCount += 1
         if left:
             #self.yvel = 0
             self.xvel = -self.speed
-            self.image = walkLeft[animCount // 3]
+            self.image = walkLeft[animCount // 15]
             animCount += 1
         if right:
             #self.yvel = 0
             self.xvel = self.speed
-            self.image = walkRight[animCount // 3]
+            self.image = walkRight[animCount // 15]
             animCount += 1
         if not (left or right) and not (up or down):
             self.xvel = 0
             self.yvel = 0
             self.image = pygame.image.load("img/down.png")
         self.rect.y += self.yvel
-        self.collide(0,self.yvel,walls)
+        self.collide(0,self.yvel,walls,grass)
 
         self.rect.x += self.xvel
-        self.collide(self.xvel,0,walls)
-        if self.random_boost == True:
-            self.seconds = round((pygame.time.get_ticks() - self.start_ticks_speed) / 1000, 2)
-            #r = random.randint(1, 2)
-            #if r == 1:
-            self.speed = 20
-            #if r == 2:
-            #   self.speed = 5
-            if self.seconds >= boost_dur:
-                self.speed = 10
-                self.random_boost = False
-                self.start_ticks_speed = 0
+        self.collide(self.xvel,0,walls,grass)
 
 
-    def collide(self,xvel,yvel,walls):
+    def collide(self,xvel,yvel,walls,grass):
         for w in walls:
             if sprite.collide_rect(self,w):
                 if isinstance(w, items.Teleport):
+                    tp_sound.play()
                     self.teleporting(w.goX, w.goY)
                 else:
                     if xvel > 0:
@@ -96,6 +88,10 @@ class Hero(pygame.sprite.Sprite):
                     if yvel < 0:
                         self.rect.top = w.rect.bottom
                         self.yvel = 0
+        for g in grass:
+            if sprite.collide_rect(self,g):
+                if isinstance(g, items.GrassWall):
+                    self.speed = g_f.h_speed - 5
     def teleporting(self,goX,goY):
         self.rect.x = goX
         self.rect.y = goY

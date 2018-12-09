@@ -2,22 +2,24 @@ import pygame
 from pygame import *
 from settings import Settings
 from items import *
+import items
 
+g_f = Settings()
 animCount = 0
-walkDown = [pygame.image.load("img/bot_animation_main.png"),pygame.image.load("img/bot_main.png"), pygame.image.load("img/bot_animation_main_2.png")]
-walkUp = [pygame.image.load("img/bot_animation_back.png"),pygame.image.load("img/bot_back.png"), pygame.image.load("img/bot_animation_back_2.png")]
-walkLeft = [pygame.image.load("img/bot_animation_left.png"),pygame.image.load("img/bot_animation_left_2.png")]
-walkRight = [pygame.image.load("img/bot_animation_right.png"), pygame.image.load("img/bot_animation_right_2.png")]
+walkDown = [pygame.image.load("img/bot2_animation_main.png"),pygame.image.load("img/bot_main_2.png"), pygame.image.load("img/bot2_animation_main2.png")]
+walkUp = [pygame.image.load("img/bot2_animation_back.png"),pygame.image.load("img/bot_2_back_2.png"), pygame.image.load("img/bot2_animation_back_2.png")]
+walkLeft = [pygame.image.load("img/bot2_animation_left.png"),pygame.image.load("img/bot2_animation_left_2.png")]
+walkRight = [pygame.image.load("img/bot2_animation_right.png"),pygame.image.load("img/bot2_right.png")]
 class Enemy(pygame.sprite.Sprite):
     def __init__(self,screen,x,y):
         super().__init__()
         self.screen = screen
-        self.image = pygame.image.load("img/bot_main.png").convert_alpha()  #розмір героя
+        self.image = pygame.image.load("img/bot_main_2.png").convert_alpha()  #розмір героя
         self.xvel = 0
         self.startX = x
         self.startY = y
         self.yvel = 0
-        self.speed = 10
+        self.speed = g_f.e_speed
         self.rect = Rect(x,y, 45, 55)
 
 
@@ -27,42 +29,42 @@ class Enemy(pygame.sprite.Sprite):
                                        #рух
 
 
-    def update(self,e_left,e_right,e_up,e_down,walls,doors):
+    def update(self,e_left,e_right,e_up,e_down,walls,doors,grass):
         global animCount
 
-        if animCount + 1 >= 9:
+        if animCount + 1 >= 30:
             animCount = 0
         if e_up:
             #self.xvel = 0
             self.yvel = -self.speed
-            self.image = walkUp[animCount // 3]
+            self.image = walkUp[animCount // 10]
             animCount += 1
         if e_down:
             #self.xvel = 0
             self.yvel = self.speed
-            self.image = walkDown[animCount // 3]
+            self.image = walkDown[animCount // 10]
             animCount += 1
         if e_left:
             #self.yvel = 0
             self.xvel = -self.speed
-            self.image = walkLeft[animCount // 4]
+            self.image = walkLeft[animCount // 15]
             animCount += 1
         if e_right:
             #self.yvel = 0
             self.xvel = self.speed
-            self.image = walkRight[animCount // 4]
+            self.image = walkRight[animCount // 15]
             animCount += 1
         if not (e_left or e_right) and not (e_up or e_down):
             self.xvel = 0
             self.yvel = 0
-            self.image = pygame.image.load("img/bot_main.png")
+            self.image = pygame.image.load("img/bot_main_2.png")
         self.rect.y += self.yvel
-        self.collide(0,self.yvel,walls,doors)
+        self.collide(0,self.yvel,walls,doors,grass)
 
         self.rect.x += self.xvel
-        self.collide(self.xvel,0,walls,doors)
+        self.collide(self.xvel,0,walls,doors,grass)
 
-    def collide(self,xvel,yvel,walls,doors):
+    def collide(self,xvel,yvel,walls,doors,grass):
         for w in walls:
             if sprite.collide_rect(self,w):
 
@@ -95,3 +97,7 @@ class Enemy(pygame.sprite.Sprite):
                 if yvel < 0:
                     self.rect.top = d.rect.bottom
                     self.yvel = 0
+        for g in grass:
+            if sprite.collide_rect(self,g):
+                if isinstance(g, items.GrassWall):
+                    self.speed = g_f.e_speed - 5
