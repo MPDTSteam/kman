@@ -38,22 +38,22 @@ class Hero(pygame.sprite.Sprite):
         if animCount + 1 >= 27:
             animCount = 0
         if up:
-            #self.xvel = 0
+            self.xvel = 0
             self.yvel = -self.speed
             self.image = walkUp[animCount // 10]
             animCount += 1
         if down:
-            #self.xvel = 0
+            self.xvel = 0
             self.yvel = self.speed
             self.image = walkDown[animCount // 10]
             animCount += 1
         if left:
-            #self.yvel = 0
+            self.yvel = 0
             self.xvel = -self.speed
             self.image = walkLeft[animCount // 15]
             animCount += 1
         if right:
-            #self.yvel = 0
+            self.yvel = 0
             self.xvel = self.speed
             self.image = walkRight[animCount // 15]
             animCount += 1
